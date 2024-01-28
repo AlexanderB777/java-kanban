@@ -20,20 +20,21 @@ public class TaskManager {
         return tasks.get(id);
     }
 
-    public void createTask(Object task) {
-        if (task.getClass() == Task.class) {
-            ((Task) task).setId(++counter);
-            tasks.put(counter, task);
-        } else if (task.getClass() == Epic.class) {
-            ((Epic) task).setId(++counter);
-            tasks.put(counter, task);
-        } else  if (task.getClass() == Subtask.class) {
-            Subtask subtaskTask = (Subtask) task;
-            subtaskTask.setId(++counter);
-            tasks.put(counter, task);
-            Epic masterEpic = (Epic) getTaskById(((Subtask) task).masterId);
-            masterEpic.putSubtask(subtaskTask);
-        }
+    public void createTask(Task task) {
+        task.setId(++counter);
+        tasks.put(counter, task);
+    }
+
+    public void createEpic(Epic epic) {
+        epic.setId(++counter);
+        tasks.put(counter, epic);
+    }
+
+    public void createSubtask(Subtask subtask) {
+        subtask.setId(++counter);
+        tasks.put(counter, subtask);
+        Epic masterEpic = (Epic) getTaskById(((Subtask) subtask).masterId);
+        masterEpic.putSubtask(subtask);
     }
 
     public void updateTask(Object updatableTask) {
