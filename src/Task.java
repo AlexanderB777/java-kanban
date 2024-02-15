@@ -47,8 +47,8 @@ public class Task {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         Task task = (Task) obj;
-        return Objects.equals(name, task.name) && Objects.equals(description, task.description) &&
-                Objects.equals(id, task.id) && Objects.equals(status, task.status);
+        return Objects.equals(this.name, task.name) && Objects.equals(this.description, task.description) &&
+                Objects.equals(this.id, task.id) && Objects.equals(this.status, task.status);
     }
 
     @Override
