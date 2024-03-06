@@ -37,8 +37,13 @@ public class Task {
     }
 
     @Override
+//    public String toString () {
+//        return "Task{" + "name='" + name + "'" + ", description.length= " + description.length() + ", id= " +
+//                id + ", status= " + status + "}";
+//    }
+
     public String toString () {
-        return "Task{" + "name='" + name + "'" + ", description.length= " + description.length() + ", id= " +
+        return "Task{" + "name='" + name + "'" + ", description= ' " + description + " ' , id= " +
                 id + ", status= " + status + "}";
     }
 
