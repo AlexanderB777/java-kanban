@@ -8,13 +8,13 @@ public class InMemoryTaskManager implements TaskManager {
     HashMap<Integer, Task> tasks;
     HashMap<Integer, Epic> epics;
     HashMap<Integer, Subtask> subtasks;
-    private final History inMemoryHistoryManager;
+    private final HistoryManager inMemoryHistoryManagerManager;
 
     public InMemoryTaskManager() throws Exception {
         epics = new HashMap<>();
         subtasks = new HashMap<>();
         tasks = new HashMap<>();
-        inMemoryHistoryManager = Managers.getDefaultHistory();
+        inMemoryHistoryManagerManager = Managers.getDefaultHistory();
     }
 
     public HashMap<Integer, Task> getTasks() {
@@ -51,21 +51,26 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTaskById(int id) {
         Task task = tasks.get(id);
-        inMemoryHistoryManager.addTask(task);
+        inMemoryHistoryManagerManager.addTask(task);
         return task;
     }
 
     @Override
     public Epic getEpicById(int id) {
         Epic task = epics.get(id);
-        inMemoryHistoryManager.addTask(task);
+        inMemoryHistoryManagerManager.addTask(task);
+        return task;
+    }
+
+    public Epic getEpicByIdForCreationSubtask(int id) {
+        Epic task = epics.get(id);
         return task;
     }
 
     @Override
-    public Subtask getSubTaskById(int id) {
+    public Subtask getSubtaskById(int id) {
         Subtask task = subtasks.get(id);
-        inMemoryHistoryManager.addTask(task);
+        inMemoryHistoryManagerManager.addTask(task);
         return subtasks.get(id);
     }
 
@@ -85,7 +90,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void createSubtask(Subtask subtask) {
         subtask.setId(++counter);
         subtasks.put(counter, subtask);
-        Epic masterEpic = getEpicById(subtask.getMasterId());
+        Epic masterEpic = getEpicByIdForCreationSubtask(subtask.getMasterId());
         masterEpic.putSubtask(subtask);
     }
 
@@ -142,7 +147,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getHistory() {
-        return inMemoryHistoryManager.getHistory();
+        return inMemoryHistoryManagerManager.getHistory();
     }
 
 }
