@@ -1,35 +1,23 @@
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
-public class InMemoryHistoryManager implements HistoryManager {
-    private final Map<Integer, Task> history;
-    private final Set<Integer> historyId; // Каталог идентификаторов задач, содержащихся в массиве history
+public class InMemoryHistoryManager implements History {
+    private final LinkedList<Task> history;
 
     public InMemoryHistoryManager() {
-        history = new LinkedHashMap<>();
-        historyId = new HashSet<>();
+        history = new LinkedList<>();
     }
 
     @Override
     public void addTask(Task task) {
-        int id = task.getId();
-        if (historyId.contains(id)) {
-            history.remove(id);
-        } else {
-            historyId.add(id);
+        if (history.size() > 9) {
+            history.removeFirst();
         }
-
-        history.put(id, task);
+        history.add(task);
     }
 
     @Override
     public List<Task> getHistory() {
-
-        return new ArrayList<>(history.values());
+        return history;
     }
-
-    @Override
-    public void removeTask(int id) {
-        history.remove(id);
-    }
-
 }
