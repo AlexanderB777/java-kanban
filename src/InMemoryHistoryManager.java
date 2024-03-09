@@ -35,25 +35,25 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     public void removeNode(Node node) {
         if (!history.containsValue(node)) return;
-        if (node.next == null) {
+        if (node.prev == null && node.next == null) {
+            history.remove(firstId);
+        } else if (node.next == null) {
             Node prevNode = node.prev;
             prevNode.next = null;
             history.remove(node.data.getId());
             lastId = prevNode.data.getId();
-            return;
         } else if (node.prev == null) {
             Node nextNode = node.next;
             nextNode.prev = null;
             history.remove(node.data.getId());
             firstId = nextNode.data.getId();
-            return;
+        } else {
+            Node prevNode = node.prev;
+            Node nextNode = node.next;
+            prevNode.next = nextNode;
+            nextNode.prev = prevNode;
+            history.remove(node.data.getId());
         }
-        Node prevNode = node.prev;
-        Node nextNode = node.next;
-        prevNode.next = nextNode;
-        nextNode.prev = prevNode;
-        history.remove(node.data.getId());
-
     }
 
     public List<Task> getTasks() {

@@ -54,6 +54,7 @@ class InMemoryHistoryManagerTest {
         manager.getTaskById(9);
         manager.getTaskById(2);
         manager.getTaskById(9);
+        manager.getTaskById(2);
 
         manager.getHistory().forEach(System.out::println);
         assertEquals(5, manager.getHistory().size());
