@@ -8,13 +8,13 @@ public class InMemoryTaskManager implements TaskManager {
     HashMap<Integer, Task> tasks;
     HashMap<Integer, Epic> epics;
     HashMap<Integer, Subtask> subtasks;
-    private final HistoryManager inMemoryHistoryManagerManager;
+    private final History inMemoryHistoryManager;
 
     public InMemoryTaskManager() throws Exception {
         epics = new HashMap<>();
         subtasks = new HashMap<>();
         tasks = new HashMap<>();
-        inMemoryHistoryManagerManager = Managers.getDefaultHistory();
+        inMemoryHistoryManager = Managers.getDefaultHistory();
     }
 
     public HashMap<Integer, Task> getTasks() {
@@ -51,26 +51,21 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTaskById(int id) {
         Task task = tasks.get(id);
-        inMemoryHistoryManagerManager.addTask(task);
+        inMemoryHistoryManager.addTask(task);
         return task;
     }
 
     @Override
     public Epic getEpicById(int id) {
         Epic task = epics.get(id);
-        inMemoryHistoryManagerManager.addTask(task);
-        return task;
-    }
-
-    public Epic getEpicByIdForCreationSubtask(int id) {
-        Epic task = epics.get(id);
+        inMemoryHistoryManager.addTask(task);
         return task;
     }
 
     @Override
     public Subtask getSubtaskById(int id) {
         Subtask task = subtasks.get(id);
-        inMemoryHistoryManagerManager.addTask(task);
+        inMemoryHistoryManager.addTask(task);
         return subtasks.get(id);
     }
 
@@ -90,7 +85,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void createSubtask(Subtask subtask) {
         subtask.setId(++counter);
         subtasks.put(counter, subtask);
-        Epic masterEpic = getEpicByIdForCreationSubtask(subtask.getMasterId());
+        Epic masterEpic = epics.get(subtask.getMasterId());
         masterEpic.putSubtask(subtask);
     }
 
@@ -147,7 +142,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Task> getHistory() {
-        return inMemoryHistoryManagerManager.getHistory();
+        return inMemoryHistoryManager.getHistory();
     }
 
 }
