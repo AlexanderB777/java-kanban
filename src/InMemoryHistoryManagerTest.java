@@ -31,7 +31,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void getHistory_listAllTasks() throws Exception {
+    void getHistoryShouldReturnArrayListSize5() throws Exception {
         TaskManager manager = Managers.getDefault();
 
         manager.createTask(new Task("Задача 1", "(1)Описание задачи 1"));
@@ -58,6 +58,42 @@ class InMemoryHistoryManagerTest {
 
         manager.getHistory().forEach(System.out::println);
         assertEquals(5, manager.getHistory().size());
-        assertEquals(List.of(1, 3, 4, 2, 9), manager.getHistory().stream().map(Task::getId).toList());
+        assertEquals(List.of(1, 3, 4, 9, 2), manager.getHistory().stream().map(Task::getId).toList());
+    }
+
+    @Test
+    void getHistoryShouldReturnArrayListSize9() throws Exception {
+        TaskManager manager = Managers.getDefault();
+
+        manager.createTask(new Task("Задача 1", "(1)Описание задачи 1"));
+        manager.createTask(new Task("Задача 2", "(2)Описание задачи 1"));
+        manager.createTask(new Task("Задача 3", "(3)Описание задачи 1"));
+        manager.createEpic(new Epic("Эпик 1", "(4)Описание эпика 1"));
+        manager.createEpic(new Epic("Эпик 2", "(5)Описание эпика 2"));
+        manager.createEpic(new Epic("Эпик 3", "(6)Описание эпика 3"));
+        manager.createSubtask(new Subtask("Субтаск 1", "(7)Описание субтаска 1 эпик(4)", 4));
+        manager.createSubtask(new Subtask("Субтаск 2", "(8)Описание субтаска 2 эпик(6)", 6));
+        manager.createSubtask(new Subtask("Субтаск 3", "(9)Описание субтаска 3 эпик(5)", 5));
+        manager.createSubtask(new Subtask("Субтаск 4", "(10)Описание субтаска 4 эпик(6)", 6));
+        manager.createSubtask(new Subtask("Субтаск 5", "(11)Описание субтаска 5 эпик(4)", 4));
+        manager.createSubtask(new Subtask("Субтаск 6", "(12)Описание субтаска 6 эпик(5)", 5));
+        manager.createSubtask(new Subtask("Субтаск 7", "(13)Описание субтаска 7 эпик(5)", 5));
+
+        manager.getTaskById(2);
+        manager.getTaskById(2);
+        manager.getTaskById(2);
+        manager.getTaskById(1);
+        manager.getEpicById(4);
+        manager.getEpicById(6);
+        manager.getSubtaskById(10);
+        manager.getSubtaskById(13);
+        manager.getTaskById(2);
+        manager.getSubtaskById(9);
+        manager.getEpicById(6);
+        manager.getEpicById(5);
+        manager.getSubtaskById(12);
+
+        manager.getHistory().forEach(System.out::println);
+        assertEquals(List.of(1, 4, 10, 13, 2, 9, 6, 5, 12), manager.getHistory().stream().map(Task::getId).toList());
     }
 }
