@@ -8,7 +8,7 @@ public class InMemoryTaskManager implements TaskManager {
     HashMap<Integer, Task> tasks;
     HashMap<Integer, Epic> epics;
     HashMap<Integer, Subtask> subtasks;
-    private final History inMemoryHistoryManager;
+    private final HistoryManager inMemoryHistoryManager;
 
     public InMemoryTaskManager() throws Exception {
         epics = new HashMap<>();

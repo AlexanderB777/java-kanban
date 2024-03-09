@@ -2,22 +2,15 @@ import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final Map<Integer, Task> history;
-    private final Set<Integer> historyId; // Каталог идентификаторов задач, содержащихся в массиве history
 
     public InMemoryHistoryManager() {
         history = new LinkedHashMap<>();
-        historyId = new HashSet<>();
     }
 
     @Override
     public void addTask(Task task) {
         int id = task.getId();
-        if (historyId.contains(id)) {
-            history.remove(id);
-        } else {
-            historyId.add(id);
-        }
-
+        history.remove(id);
         history.put(id, task);
     }
 
