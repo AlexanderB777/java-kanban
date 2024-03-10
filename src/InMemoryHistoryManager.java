@@ -5,12 +5,10 @@ import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final Map<Integer, Node> history;
-    //    private final List<Task> listOfTasks;
     private int firstId = -1;
     private int lastId = -1;
 
     public InMemoryHistoryManager() {
-//        listOfTasks = new ArrayList<>();
         history = new HashMap<>();
     }
 
