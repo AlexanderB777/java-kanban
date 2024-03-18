@@ -1,9 +1,11 @@
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-public class Epic extends Task{
+public class Epic extends Task {
     public ArrayList<Subtask> subtasks;
     public HashMap<Integer, Integer> indexById;
+
     public Epic(String name, String description) {
         super(name, description);
         subtasks = new ArrayList<>();
@@ -40,23 +42,24 @@ public class Epic extends Task{
             return;
         }
         for (Subtask subtask : subtasks) { // Если есть 2 задачи с разным статусом, то проверка так же не имеет смысла
-                if (subtask.getStatus() != status) {
-                    setStatus(TaskStatus.IN_PROGRESS);
-                    return;
+            if (subtask.getStatus() != status) {
+                setStatus(TaskStatus.IN_PROGRESS);
+                return;
             }
         }
         setStatus(firstStatus); // Если цикл завершился, значит все задачи одного статуса, его и устанавливает для эпика
     }
 
-    public void putSubtask (Subtask subtask) {
+    public void putSubtask(Subtask subtask) {
         subtasks.add(subtask);
         indexById.put(subtask.getId(), subtasks.indexOf(subtask));
         checkAndChangeStatus();
     }
 
     @Override
-    public String toString () {
-        return "Epic{" + "name='" + name + "'" + ", description.length= " + description.length() + ", id= " +
-                id + ", status= " + status + ", subtasks= " + subtasks + "}";
+    public String toString() {
+        return TaskTypes.EPIC + "," + id + "," + name + "," + status + "," + description;
+
     }
+
 }
