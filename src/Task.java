@@ -28,6 +28,7 @@ public class Task {
     public void setId(int id) {
         this.id = id;
     }
+
     public int getId() {
         return id;
     }
@@ -37,14 +38,8 @@ public class Task {
     }
 
     @Override
-//    public String toString () {
-//        return "Task{" + "name='" + name + "'" + ", description.length= " + description.length() + ", id= " +
-//                id + ", status= " + status + "}";
-//    }
-
-    public String toString () {
-        return "Task{" + "name='" + name + "'" + ", description= ' " + description + " ' , id= " +
-                id + ", status= " + status + "}";
+    public String toString() {
+        return TaskTypes.TASK + "," + id + "," + name + "," + status + "," + description;
     }
 
     @Override
