@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    File file;
+    private final File file;
     FileBackedHistoryManager historyManager;
 
     public FileBackedTaskManager() throws Exception {
@@ -13,7 +13,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         historyManager = Managers.getFileBackedHistoryManager();
         file = new File("src/TaskStorage.csv");
     }
-
 
     public List<String> getListFromFile(File file) {
         List<String> fromFile = new ArrayList<>();
@@ -43,6 +42,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     createEpic(new Epic(fromLine[2], fromLine[4],
                             TaskStatus.valueOf(fromLine[3]), Integer.parseInt(fromLine[1])));
                     break;
+                default:
+                    return;
             }
         }
     }

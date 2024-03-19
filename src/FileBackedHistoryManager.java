@@ -16,7 +16,6 @@ public class FileBackedHistoryManager extends InMemoryHistoryManager {
         writeListToFile(tasksInStringArray, file);
     }
 
-
     public void writeListToFile(List<String> list, File file) {
         String toWrite = getStringForWriteFromList(list);
         try (FileWriter fw = new FileWriter(file)) {
@@ -68,17 +67,12 @@ public class FileBackedHistoryManager extends InMemoryHistoryManager {
                     default:
                         throw new IllegalStateException("Unexpected value: " + type);
                 }
-
             }
         } catch (IOException e) {
             throw new RuntimeException();
         }
-
-
-
         return result;
     }
-
 
     @Override
     public void add(Task task) {
