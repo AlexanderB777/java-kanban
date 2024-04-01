@@ -28,7 +28,6 @@ public class Subtask extends Task {
 
     @Override
     public String toString () {
-        return "Subtask{" + "name='" + name + "'" + ", description.length= " + description.length() + ", id= " +
-                id + ", status= " + status + ", masterId= " + masterId + "}";
+        return TaskTypes.SUBTASK + "," + id + "," + name + "," + status + "," + description + "," + masterId;
     }
 }

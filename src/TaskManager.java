@@ -9,6 +9,8 @@ public interface TaskManager {
 
     void removeAllSubtasks();
 
+    void removeAllTasks();
+
     Task getTaskById(int id);
 
     Epic getEpicById(int id);
