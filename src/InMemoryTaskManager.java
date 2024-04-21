@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     public static int counter;
@@ -9,6 +6,8 @@ public class InMemoryTaskManager implements TaskManager {
     HashMap<Integer, Epic> epics;
     HashMap<Integer, Subtask> subtasks;
     HistoryManager historyManager;
+    TreeSet<Task> prioritizedTasks;
+    TaskByStartTimeComparator comp = new TaskByStartTimeComparator();
 
     public InMemoryTaskManager() throws Exception {
         counter = 0;
@@ -16,6 +15,7 @@ public class InMemoryTaskManager implements TaskManager {
         subtasks = new HashMap<>();
         tasks = new HashMap<>();
         historyManager = Managers.getDefaultHistory();
+        prioritizedTasks = new TreeSet<>(comp);
     }
 
     public HashMap<Integer, Task> getTasks() {
@@ -73,8 +73,14 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createTask(Task task) {
+        List<Task> resultOfChecking = getPrioritizedTasks()
+                .stream()
+                .filter(task1 -> !(task.startTime.isAfter(task1.getEndTime()) || task1.startTime.isAfter(task.getEndTime())))
+                .toList();
+        if (!resultOfChecking.isEmpty()) return;
         task.setId(++counter);
         tasks.put(counter, task);
+        if (task.startTime != null) addToPrioritized(task);
     }
 
     @Override
@@ -85,10 +91,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createSubtask(Subtask subtask) {
+        List<Task> resultOfChecking = getPrioritizedTasks()
+                .stream()
+                .filter(task1 -> !(subtask.startTime.isAfter(task1.getEndTime()) || task1.startTime.isAfter(subtask.getEndTime())))
+                .toList();
+        if (!resultOfChecking.isEmpty()) return;
         subtask.setId(++counter);
         subtasks.put(counter, subtask);
         Epic masterEpic = epics.get(subtask.getMasterId());
         masterEpic.putSubtask(subtask);
+        if (subtask.startTime != null) {
+            addToPrioritized(subtask);
+            addToPrioritized(masterEpic);
+        }
     }
 
     @Override
@@ -147,4 +162,14 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        return prioritizedTasks.stream().toList();
+    }
+
+    @Override
+    public void addToPrioritized(Task task) {
+        prioritizedTasks.add(task);
+    }
 }
+

@@ -1,4 +1,6 @@
 import java.io.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +13,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public FileBackedTaskManager() throws Exception {
         super();
         historyManager = Managers.getFileBackedHistoryManager();
-        file = new File("src/TaskStorage.csv");
+        file = new File("src/Task_storage.csv");
+    }
+
+    public void restore() {
+        restoreFromList(getListFromFile(file));
     }
 
     public List<String> getListFromFile(File file) {
@@ -31,16 +37,27 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             String[] fromLine = line.split(",");
             switch (fromLine[0]) {
                 case ("TASK"):
-                    createTask(new Task(fromLine[2], fromLine[4],
-                            TaskStatus.valueOf(fromLine[3]), Integer.parseInt(fromLine[1])));
+                    createTask(new Task(fromLine[2],
+                            fromLine[4],
+                            TaskStatus.valueOf(fromLine[3]),
+                            Integer.parseInt(fromLine[1]),
+                            LocalDateTime.parse(fromLine[5]),
+                            Duration.parse(fromLine[6])));
                     break;
                 case ("SUBTASK"):
-                    createSubtask(new Subtask(fromLine[2], fromLine[4], Integer.parseInt(fromLine[5]),
-                            TaskStatus.valueOf(fromLine[3]), Integer.parseInt(fromLine[1])));
+                    createSubtask(new Subtask(fromLine[2],
+                            fromLine[4],
+                            Integer.parseInt(fromLine[5]),
+                            TaskStatus.valueOf(fromLine[3]),
+                            Integer.parseInt(fromLine[1]),
+                            LocalDateTime.parse(fromLine[6]),
+                            Duration.parse(fromLine[7])));
                     break;
                 case ("EPIC"):
-                    createEpic(new Epic(fromLine[2], fromLine[4],
-                            TaskStatus.valueOf(fromLine[3]), Integer.parseInt(fromLine[1])));
+                    createEpic(new Epic(fromLine[2],
+                            fromLine[4],
+                            TaskStatus.valueOf(fromLine[3]),
+                            Integer.parseInt(fromLine[1])));
                     break;
                 default:
                     return;
