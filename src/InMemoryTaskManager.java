@@ -44,10 +44,11 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeAllSubtasks() {
         subtasks.clear();
-        for (Map.Entry<Integer, Epic> entry : epics.entrySet()) {
-            Epic epic = entry.getValue();
+        epics.values().forEach(epic -> {
             epic.checkAndChangeStatus();
-        }
+            epic.indexById.clear();
+            epic.subtasks.clear();
+        });
     }
 
     @Override
@@ -73,11 +74,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createTask(Task task) {
-        List<Task> resultOfChecking = getPrioritizedTasks()
+        if (!getPrioritizedTasks()
                 .stream()
-                .filter(task1 -> !(task.startTime.isAfter(task1.getEndTime()) || task1.startTime.isAfter(task.getEndTime())))
-                .toList();
-        if (!resultOfChecking.isEmpty()) return;
+                .allMatch(task1 -> task.startTime.isAfter(task1.getEndTime())
+                        || task1.startTime.isAfter(task.getEndTime()))) return;
         task.setId(++counter);
         tasks.put(counter, task);
         if (task.startTime != null) addToPrioritized(task);
@@ -91,11 +91,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createSubtask(Subtask subtask) {
-        List<Task> resultOfChecking = getPrioritizedTasks()
+        if (!getPrioritizedTasks()
                 .stream()
-                .filter(task1 -> !(subtask.startTime.isAfter(task1.getEndTime()) || task1.startTime.isAfter(subtask.getEndTime())))
-                .toList();
-        if (!resultOfChecking.isEmpty()) return;
+                .allMatch(task1 -> subtask.startTime.isAfter(task1.getEndTime())
+                        || task1.startTime.isAfter(subtask.getEndTime()))) return;
         subtask.setId(++counter);
         subtasks.put(counter, subtask);
         Epic masterEpic = epics.get(subtask.getMasterId());
@@ -135,10 +134,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeEpicById(int id) {
         Epic epic = epics.get(id);
-        for (Map.Entry<Integer, Integer> entry : epic.indexById.entrySet()) {
-            int subtaskId = entry.getKey();
-            subtasks.remove(subtaskId);
-        }
+        epic.indexById.keySet().forEach(subtaskId -> subtasks.remove(subtaskId));
         epics.remove(id);
     }
 
@@ -170,6 +166,11 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void addToPrioritized(Task task) {
         prioritizedTasks.add(task);
+    }
+
+    @Override
+    public List<Subtask> getEpicSubtasks(int epicId) {
+        return epics.get(epicId).subtasks;
     }
 }
 

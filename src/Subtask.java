@@ -36,11 +36,6 @@ public class Subtask extends Task {
         return masterId;
     }
 
-//    @Override
-//    public String toString () {
-//        return TaskTypes.SUBTASK + "," + id + "," + name + "," + status + "," + description + "," + masterId;
-//    }
-
     @Override
     public String toString() {
         StringJoiner stringJoiner = new StringJoiner(",");
