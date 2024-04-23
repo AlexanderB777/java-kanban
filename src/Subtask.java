@@ -1,3 +1,7 @@
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.StringJoiner;
+
 public class Subtask extends Task {
     public final int masterId;
     public Subtask(String name, String description, int masterId) {
@@ -5,17 +9,23 @@ public class Subtask extends Task {
         this.masterId = masterId;
     }
 
-    public Subtask(String name, String description, int masterId, TaskStatus status) {
-        super(name, description);
-        this.masterId = masterId;
-        this.status = status;
-    }
-
     public Subtask(String name, String description, int masterId, TaskStatus status, int id) {
         super(name, description);
         this.masterId = masterId;
         this.status = status;
         this.id = id;
+    }
+
+    public Subtask(String name, String description, int masterId, LocalDateTime startTime, Duration duration) {
+        this(name, description, masterId);
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
+    public Subtask(String name, String description, int masterId, TaskStatus status, int id, LocalDateTime startTime, Duration duration) {
+        this(name, description, masterId, startTime, duration);
+        this.id = id;
+        this.status = status;
     }
 
     public TaskStatus getStatus() {
@@ -27,7 +37,17 @@ public class Subtask extends Task {
     }
 
     @Override
-    public String toString () {
-        return TaskTypes.SUBTASK + "," + id + "," + name + "," + status + "," + description + "," + masterId;
+    public String toString() {
+        StringJoiner stringJoiner = new StringJoiner(",");
+        stringJoiner
+                .add(TaskTypes.SUBTASK.name())
+                .add(String.valueOf(id))
+                .add(name)
+                .add(status.name())
+                .add(description)
+                .add(String.valueOf(masterId))
+                .add(startTime.toString())
+                .add(duration.toString());
+        return stringJoiner.toString();
     }
 }

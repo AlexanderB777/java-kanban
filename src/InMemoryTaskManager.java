@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     public static int counter;
@@ -9,6 +6,8 @@ public class InMemoryTaskManager implements TaskManager {
     HashMap<Integer, Epic> epics;
     HashMap<Integer, Subtask> subtasks;
     HistoryManager historyManager;
+    TreeSet<Task> prioritizedTasks;
+    TaskByStartTimeComparator comp = new TaskByStartTimeComparator();
 
     public InMemoryTaskManager() throws Exception {
         counter = 0;
@@ -16,6 +15,7 @@ public class InMemoryTaskManager implements TaskManager {
         subtasks = new HashMap<>();
         tasks = new HashMap<>();
         historyManager = Managers.getDefaultHistory();
+        prioritizedTasks = new TreeSet<>(comp);
     }
 
     public HashMap<Integer, Task> getTasks() {
@@ -44,10 +44,11 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeAllSubtasks() {
         subtasks.clear();
-        for (Map.Entry<Integer, Epic> entry : epics.entrySet()) {
-            Epic epic = entry.getValue();
+        epics.values().forEach(epic -> {
             epic.checkAndChangeStatus();
-        }
+            epic.indexById.clear();
+            epic.subtasks.clear();
+        });
     }
 
     @Override
@@ -73,8 +74,13 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createTask(Task task) {
+        if (!getPrioritizedTasks()
+                .stream()
+                .allMatch(task1 -> task.startTime.isAfter(task1.getEndTime())
+                        || task1.startTime.isAfter(task.getEndTime()))) return;
         task.setId(++counter);
         tasks.put(counter, task);
+        if (task.startTime != null) addToPrioritized(task);
     }
 
     @Override
@@ -85,10 +91,18 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createSubtask(Subtask subtask) {
+        if (!getPrioritizedTasks()
+                .stream()
+                .allMatch(task1 -> subtask.startTime.isAfter(task1.getEndTime())
+                        || task1.startTime.isAfter(subtask.getEndTime()))) return;
         subtask.setId(++counter);
         subtasks.put(counter, subtask);
         Epic masterEpic = epics.get(subtask.getMasterId());
         masterEpic.putSubtask(subtask);
+        if (subtask.startTime != null) {
+            addToPrioritized(subtask);
+            addToPrioritized(masterEpic);
+        }
     }
 
     @Override
@@ -120,10 +134,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeEpicById(int id) {
         Epic epic = epics.get(id);
-        for (Map.Entry<Integer, Integer> entry : epic.indexById.entrySet()) {
-            int subtaskId = entry.getKey();
-            subtasks.remove(subtaskId);
-        }
+        epic.indexById.keySet().forEach(subtaskId -> subtasks.remove(subtaskId));
         epics.remove(id);
     }
 
@@ -147,4 +158,19 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        return prioritizedTasks.stream().toList();
+    }
+
+    @Override
+    public void addToPrioritized(Task task) {
+        prioritizedTasks.add(task);
+    }
+
+    @Override
+    public List<Subtask> getEpicSubtasks(int epicId) {
+        return epics.get(epicId).subtasks;
+    }
 }
+

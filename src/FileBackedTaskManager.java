@@ -1,5 +1,8 @@
 import java.io.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +14,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public FileBackedTaskManager() throws Exception {
         super();
         historyManager = Managers.getFileBackedHistoryManager();
-        file = new File("src/TaskStorage.csv");
+        file = new File("src/Task_storage.csv");
+    }
+
+    public void restore() {
+        restoreFromList(getListFromFile(file));
     }
 
     public List<String> getListFromFile(File file) {
@@ -31,16 +38,27 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             String[] fromLine = line.split(",");
             switch (fromLine[0]) {
                 case ("TASK"):
-                    createTask(new Task(fromLine[2], fromLine[4],
-                            TaskStatus.valueOf(fromLine[3]), Integer.parseInt(fromLine[1])));
+                    createTask(new Task(fromLine[2],
+                            fromLine[4],
+                            TaskStatus.valueOf(fromLine[3]),
+                            Integer.parseInt(fromLine[1]),
+                            LocalDateTime.parse(fromLine[5]),
+                            Duration.parse(fromLine[6])));
                     break;
                 case ("SUBTASK"):
-                    createSubtask(new Subtask(fromLine[2], fromLine[4], Integer.parseInt(fromLine[5]),
-                            TaskStatus.valueOf(fromLine[3]), Integer.parseInt(fromLine[1])));
+                    createSubtask(new Subtask(fromLine[2],
+                            fromLine[4],
+                            Integer.parseInt(fromLine[5]),
+                            TaskStatus.valueOf(fromLine[3]),
+                            Integer.parseInt(fromLine[1]),
+                            LocalDateTime.parse(fromLine[6]),
+                            Duration.parse(fromLine[7])));
                     break;
                 case ("EPIC"):
-                    createEpic(new Epic(fromLine[2], fromLine[4],
-                            TaskStatus.valueOf(fromLine[3]), Integer.parseInt(fromLine[1])));
+                    createEpic(new Epic(fromLine[2],
+                            fromLine[4],
+                            TaskStatus.valueOf(fromLine[3]),
+                            Integer.parseInt(fromLine[1])));
                     break;
                 default:
                     return;
@@ -56,31 +74,20 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public List<String> getAllTasksForFile() {
-        List<String> result = new ArrayList<>();
         List<Object> listWithAllTasks = new ArrayList<>();
-        for (Map.Entry entry : tasks.entrySet()) {
-            listWithAllTasks.add(entry.getValue());
-        }
-        for (Map.Entry entry : epics.entrySet()) {
-            listWithAllTasks.add(entry.getValue());
-        }
-        for (Map.Entry entry : subtasks.entrySet()) {
-            listWithAllTasks.add(entry.getValue());
-        }
-
-        for (Object task : listWithAllTasks) {
-            result.add(task.toString());
-        }
-        return result;
+        listWithAllTasks.addAll(tasks.values());
+        listWithAllTasks.addAll(epics.values());
+        listWithAllTasks.addAll(subtasks.values());
+        return listWithAllTasks.stream().map(Object::toString).toList();
     }
 
     public String getStringForWriteFromList(List<String> list) {
-        StringBuilder sb = new StringBuilder(list.get(0));
-        if (list.size() > 1) {
-            for (int i = 1; i < list.size(); i++) {
-                sb.append("\n").append(list.get(i));
-            }
-        }
+        if (list.isEmpty()) return "";
+        StringBuilder sb = new StringBuilder();
+//        if (!list.isEmpty()) {
+            list.stream().map(string -> "\n" + string).forEachOrdered(sb::append);
+//        }
+
         return sb.toString();
     }
 

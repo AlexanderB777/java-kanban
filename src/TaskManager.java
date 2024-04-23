@@ -5,6 +5,7 @@ public interface TaskManager {
     HashMap<Integer, Task> getTasks();
     HashMap<Integer, Epic> getEpics();
     HashMap<Integer, Subtask> getSubtasks();
+
     void removeAllEpics();
 
     void removeAllSubtasks();
@@ -39,5 +40,9 @@ public interface TaskManager {
 
     List<Task> getHistory();
 
+    List<Task> getPrioritizedTasks();
 
+    void addToPrioritized(Task task);
+
+    List<Subtask> getEpicSubtasks(int epicId);
 }

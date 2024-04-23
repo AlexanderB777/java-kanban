@@ -1,10 +1,15 @@
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.StringJoiner;
 
 public class Task {
     protected int id;
     protected String name;
     protected String description;
     protected TaskStatus status;
+    protected Duration duration;
+    protected LocalDateTime startTime;
 
     public Task(String name, String description) {
         this.name = name;
@@ -13,16 +18,30 @@ public class Task {
     }
 
     public Task(String name, String description, TaskStatus status) {
-        this.name = name;
-        this.description = description;
+        this(name, description);
         this.status = status;
     }
 
     public Task(String name, String description, TaskStatus status, int id) {
-        this.name = name;
-        this.description = description;
-        this.status = status;
+        this(name, description, status);
         this.id = id;
+
+    }
+
+    public Task(String name, String description, LocalDateTime startTime, Duration duration) {
+        this(name, description);
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
+    public Task(String name, String description, TaskStatus status, int id, LocalDateTime startTime, Duration duration) {
+        this(name, description, status, id);
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
     }
 
     public void setId(int id) {
@@ -39,7 +58,16 @@ public class Task {
 
     @Override
     public String toString() {
-        return TaskTypes.TASK + "," + id + "," + name + "," + status + "," + description;
+        StringJoiner stringJoiner = new StringJoiner(",");
+        stringJoiner
+                .add(TaskTypes.TASK.name())
+                .add(String.valueOf(id))
+                .add(name)
+                .add(status.name())
+                .add(description)
+                .add(startTime.toString())
+                .add(duration.toString());
+        return stringJoiner.toString();
     }
 
     @Override
@@ -62,4 +90,15 @@ public class Task {
         if (status != null) hash += status.hashCode();
         return hash;
     }
+
+//    @Override
+//    public int compareTo(Task o) {
+//        if (this.startTime.isBefore(o.startTime)) {
+//            return 1;
+//        }
+//        if (this.startTime.isAfter(o.startTime)) {
+//            return -1;
+//        }
+//        return 0;
+//    }
 }

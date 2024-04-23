@@ -1,7 +1,7 @@
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -95,5 +95,17 @@ class InMemoryHistoryManagerTest {
 
         manager.getHistory().forEach(System.out::println);
         assertEquals(List.of(1, 4, 10, 13, 2, 9, 6, 5, 12), manager.getHistory().stream().map(Task::getId).toList());
+    }
+
+    @Test
+    void calculateEndTIme() {
+        LocalDateTime startTime = LocalDateTime.of(2024, 4, 21, 12, 0, 0);
+        Duration duration = Duration.ofHours(4);
+        LocalDateTime expectedEndDate = LocalDateTime.of(2024, 4, 21, 16, 0, 0);
+        Task task = new Task("Дело 1", "Сделать дело 1", TaskStatus.NEW, 1, startTime, duration);
+
+        LocalDateTime actualEndTime = task.getEndTime();
+
+        assertEquals(expectedEndDate, actualEndTime);
     }
 }

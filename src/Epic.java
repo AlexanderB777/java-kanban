@@ -1,30 +1,34 @@
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.StringJoiner;
 
 public class Epic extends Task {
     public ArrayList<Subtask> subtasks;
     public HashMap<Integer, Integer> indexById;
+    private LocalDateTime endTime;
 
     public Epic(String name, String description) {
         super(name, description);
         subtasks = new ArrayList<>();
         indexById = new HashMap<>();
+        duration = Duration.ZERO;
     }
 
     public Epic(String name, String description, TaskStatus status) {
-        super(name, description);
-        subtasks = new ArrayList<>();
-        indexById = new HashMap<>();
+        this(name, description);
         this.status = status;
     }
 
     public Epic(String name, String description, TaskStatus status, int id) {
-        super(name, description);
-        subtasks = new ArrayList<>();
-        indexById = new HashMap<>();
-        this.status = status;
+        this(name, description, status);
         this.id = id;
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
     private void setStatus(TaskStatus status) {
@@ -50,7 +54,14 @@ public class Epic extends Task {
         setStatus(firstStatus); // Если цикл завершился, значит все задачи одного статуса, его и устанавливает для эпика
     }
 
-    public void putSubtask(Subtask subtask) {
+    public void putSubtask (Subtask subtask) {
+        if (startTime == null || subtask.startTime.isBefore(startTime)) {
+            startTime = subtask.startTime;
+        }
+        duration = duration.plus(subtask.duration);
+        if (endTime == null || subtask.getEndTime().isAfter(endTime)) {
+            endTime = subtask.getEndTime();
+        }
         subtasks.add(subtask);
         indexById.put(subtask.getId(), subtasks.indexOf(subtask));
         checkAndChangeStatus();
@@ -58,8 +69,14 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return TaskTypes.EPIC + "," + id + "," + name + "," + status + "," + description;
-
+        StringJoiner stringJoiner = new StringJoiner(",");
+        stringJoiner
+                .add(TaskTypes.EPIC.name())
+                .add(String.valueOf(id))
+                .add(name)
+                .add(status.name())
+                .add(description);
+        return stringJoiner.toString();
     }
 
 }
