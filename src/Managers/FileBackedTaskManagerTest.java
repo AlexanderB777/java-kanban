@@ -1,6 +1,10 @@
+package Managers;
+
+import Tasks.Epic;
+import Tasks.Subtask;
+import Tasks.Task;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -51,8 +55,8 @@ class FileBackedTaskManagerTest {
                 "Субтаск 7", "(13)Описание субтаска 7 эпик(5)", 5, time10, duration10));
 
         manager.save();
-        String actualContent = Files.readString(Paths.get("src/Task_storage.csv"));
-        String expectedContent = Files.readString(Paths.get("src/expected_save_file.csv"));
+        String actualContent = Files.readString(Paths.get("src/Managers/Task_storage.csv"));
+        String expectedContent = Files.readString(Paths.get("src/Managers/expected_save_file.csv"));
         assertEquals(expectedContent, actualContent);
 
     }
@@ -101,10 +105,8 @@ class FileBackedTaskManagerTest {
         manager.save();
         manager.restore();
         manager.save();
-        String actualContent = Files.readString(Paths.get("src/Task_storage.csv"));
-        String expectedContent = Files.readString(Paths.get("src/expected_save_file.csv"));
+        String actualContent = Files.readString(Paths.get("src/Managers/Task_storage.csv"));
+        String expectedContent = Files.readString(Paths.get("src/Managers/expected_save_file.csv"));
         assertEquals(expectedContent, actualContent);
-
-
     }
 }
