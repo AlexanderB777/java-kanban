@@ -1,3 +1,7 @@
+package Managers;
+
+import Tasks.*;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -15,7 +19,7 @@ class InMemoryHistoryManagerTest {
         manager.createTask(new Task("Дело 2", "Сделать дело 2"));
         manager.getTaskById(1);
         Task expected = new Task("Дело 1", "Сделать дело 1", TaskStatus.NEW, 1);
-        assertEquals(expected, manager.getHistory().get(0));
+        Assertions.assertEquals(expected, manager.getHistory().get(0));
     }
 
     @Test
@@ -27,7 +31,7 @@ class InMemoryHistoryManagerTest {
         manager.getTaskById(1);
         manager.getTaskById(2);
 
-        assertEquals(2, manager.getHistory().size());
+        Assertions.assertEquals(2, manager.getHistory().size());
     }
 
     @Test
@@ -57,8 +61,8 @@ class InMemoryHistoryManagerTest {
         manager.getTaskById(2);
 
         manager.getHistory().forEach(System.out::println);
-        assertEquals(5, manager.getHistory().size());
-        assertEquals(List.of(1, 3, 4, 9, 2), manager.getHistory().stream().map(Task::getId).toList());
+        Assertions.assertEquals(5, manager.getHistory().size());
+        Assertions.assertEquals(List.of(1, 3, 4, 9, 2), manager.getHistory().stream().map(Task::getId).toList());
     }
 
     @Test
@@ -94,7 +98,7 @@ class InMemoryHistoryManagerTest {
         manager.getSubtaskById(12);
 
         manager.getHistory().forEach(System.out::println);
-        assertEquals(List.of(1, 4, 10, 13, 2, 9, 6, 5, 12), manager.getHistory().stream().map(Task::getId).toList());
+        Assertions.assertEquals(List.of(1, 4, 10, 13, 2, 9, 6, 5, 12), manager.getHistory().stream().map(Task::getId).toList());
     }
 
     @Test

@@ -1,3 +1,7 @@
+package Tasks;
+
+import Tasks.Task;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.StringJoiner;

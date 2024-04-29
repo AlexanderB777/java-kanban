@@ -1,3 +1,9 @@
+package Managers;
+
+import Tasks.Epic;
+import Tasks.Subtask;
+import Tasks.Task;
+
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
@@ -173,4 +179,3 @@ public class InMemoryTaskManager implements TaskManager {
         return epics.get(epicId).subtasks;
     }
 }
-

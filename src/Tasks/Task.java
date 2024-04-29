@@ -1,3 +1,5 @@
+package Tasks;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -9,7 +11,7 @@ public class Task {
     protected String description;
     protected TaskStatus status;
     protected Duration duration;
-    protected LocalDateTime startTime;
+    public LocalDateTime startTime;
 
     public Task(String name, String description) {
         this.name = name;
@@ -90,15 +92,4 @@ public class Task {
         if (status != null) hash += status.hashCode();
         return hash;
     }
-
-//    @Override
-//    public int compareTo(Task o) {
-//        if (this.startTime.isBefore(o.startTime)) {
-//            return 1;
-//        }
-//        if (this.startTime.isAfter(o.startTime)) {
-//            return -1;
-//        }
-//        return 0;
-//    }
 }

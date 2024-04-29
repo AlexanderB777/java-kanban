@@ -1,3 +1,7 @@
+package Managers;
+
+import Tasks.Task;
+
 import java.util.Comparator;
 
 public class TaskByStartTimeComparator implements Comparator<Task> {

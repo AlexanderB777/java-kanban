@@ -1,3 +1,7 @@
+package Managers;
+
+import Tasks.*;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,7 +12,7 @@ public class FileBackedHistoryManager extends InMemoryHistoryManager {
 
     public FileBackedHistoryManager() {
         super();
-        file = new File("src/History.csv");
+        file = new File("src/Managers/History.csv");
     }
 
     public void save() {
@@ -91,4 +95,3 @@ public class FileBackedHistoryManager extends InMemoryHistoryManager {
         return getListFromFile();
     }
 }
-

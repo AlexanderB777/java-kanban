@@ -1,10 +1,12 @@
+package Managers;
+
+import Tasks.*;
+
 import java.io.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -14,7 +16,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public FileBackedTaskManager() throws Exception {
         super();
         historyManager = Managers.getFileBackedHistoryManager();
-        file = new File("src/Task_storage.csv");
+        file = new File("src/Managers/Task_storage.csv");
     }
 
     public void restore() {
@@ -66,7 +68,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-
     public void save() {
         List<String> allTasks = getAllTasksForFile();
         writeListToFile(allTasks, file);
@@ -84,10 +85,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public String getStringForWriteFromList(List<String> list) {
         if (list.isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
-//        if (!list.isEmpty()) {
-            list.stream().map(string -> "\n" + string).forEachOrdered(sb::append);
-//        }
-
+        list.stream().map(string -> "\n" + string).forEachOrdered(sb::append);
         return sb.toString();
     }
 
