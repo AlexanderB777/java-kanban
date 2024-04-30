@@ -3,6 +3,8 @@ package Managers;
 import Tasks.Epic;
 import Tasks.Subtask;
 import Tasks.Task;
+import utils.SubtaskCreationException;
+import utils.TaskInteractionException;
 
 import java.util.*;
 
@@ -80,30 +82,57 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void createTask(Task task) {
+        if (task.getId() != null || task.getId() != 0) {
+            throw new IllegalArgumentException("Task should not contain ID");
+        }
+
         if (!getPrioritizedTasks()
                 .stream()
                 .allMatch(task1 -> task.startTime.isAfter(task1.getEndTime())
-                        || task1.startTime.isAfter(task.getEndTime()))) return;
+                        || task1.startTime.isAfter(task.getEndTime()))) {
+            throw new TaskInteractionException(String.format("Task id=%s intercepts with another task!", task.getId()));
+        }
         task.setId(++counter);
         tasks.put(counter, task);
+
+
         if (task.startTime != null) addToPrioritized(task);
     }
 
+
     @Override
     public void createEpic(Epic epic) {
+        if (epic.getId() != null || epic.getId() != 0) {
+            throw new IllegalArgumentException("Epic should not contain ID");
+        }
         epic.setId(++counter);
         epics.put(counter, epic);
     }
 
     @Override
     public void createSubtask(Subtask subtask) {
+        if (subtask.getId() != null) {
+            throw new IllegalArgumentException("Task should not contain ID");
+        }
+
+        int masterId = subtask.getMasterId();
+        if (!epics.containsKey(masterId)) {
+            throw new SubtaskCreationException("Subtask couldn't be created without master ID");
+        }
+
         if (!getPrioritizedTasks()
                 .stream()
                 .allMatch(task1 -> subtask.startTime.isAfter(task1.getEndTime())
-                        || task1.startTime.isAfter(subtask.getEndTime()))) return;
+                        || task1.startTime.isAfter(subtask.getEndTime()))) {
+            throw new TaskInteractionException("Subtask has interactions");
+        }
         subtask.setId(++counter);
         subtasks.put(counter, subtask);
-        Epic masterEpic = epics.get(subtask.getMasterId());
+        Epic masterEpic = epics.get(masterId);
+        if (masterEpic == null) {
+            System.out.println("Master epic of subtask with id " + subtask.getId() + " is null");
+            return;
+        }
         masterEpic.putSubtask(subtask);
         if (subtask.startTime != null) {
             addToPrioritized(subtask);
@@ -113,15 +142,27 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTask(Task task) {
+        if (!getPrioritizedTasks()
+                .stream()
+                .allMatch(task1 -> task.startTime.isAfter(task1.getEndTime())
+                        || task1.startTime.isAfter(task.getEndTime()))) {
+            throw new TaskInteractionException("Subtask has interactions");
+        }
         int id = task.getId();
         tasks.replace(id, task);
     }
 
     @Override
     public void updateSubtask(Subtask subtask) {
+        if (!getPrioritizedTasks()
+                .stream()
+                .allMatch(task1 -> subtask.startTime.isAfter(task1.getEndTime())
+                        || task1.startTime.isAfter(subtask.getEndTime()))) {
+            throw new TaskInteractionException("Subtask has interactions");
+        }
         int id = subtask.getId();
         subtasks.replace(id, subtask);
-        Epic masterEpic = getEpicById(subtask.masterId);
+        Epic masterEpic = getEpicById(subtask.getMasterId());
         masterEpic.subtasks.set(masterEpic.indexById.get(id), subtask);
         masterEpic.checkAndChangeStatus();
     }
@@ -147,7 +188,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeSubtaskById(int id) {
         Subtask subtask = subtasks.get(id);
-        Epic masterEpic = epics.get(subtask.masterId);
+        Epic masterEpic = epics.get(subtask.getMasterId());
         masterEpic.subtasks.remove(subtask);
         masterEpic.indexById.remove(id);
         subtasks.remove(id);

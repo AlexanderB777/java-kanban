@@ -3,6 +3,7 @@ package Managers;
 import Tasks.Epic;
 import Tasks.Subtask;
 import Tasks.Task;
+import utils.TaskInteractionException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +25,7 @@ public interface TaskManager {
 
     Subtask getSubtaskById(int id);
 
-    void createTask(Task task);
+    void createTask(Task task) throws TaskInteractionException;
 
     void createEpic(Epic epic);
 
