@@ -10,8 +10,6 @@ import java.time.format.DateTimeFormatter;
 
 public class DurationAdapter extends TypeAdapter<Duration> {
 
-
-
     @Override
     public void write(JsonWriter out, Duration value) throws IOException {
         out.value(value.toString());

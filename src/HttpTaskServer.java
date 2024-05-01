@@ -20,9 +20,15 @@ public class HttpTaskServer {
 
         httpServer.start();
 
-//
-//        httpServer.stop(1);
+
+
     }
+
+    public void stop(HttpServer httpServer) {
+        httpServer.stop(1);
+    }
+
+
 }
 
 
