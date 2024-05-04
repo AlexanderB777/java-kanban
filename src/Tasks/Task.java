@@ -6,7 +6,7 @@ import java.util.Objects;
 import java.util.StringJoiner;
 
 public class Task {
-    protected int id;
+    protected Integer id = null;
     protected String name;
     protected String description;
     protected TaskStatus status;
@@ -50,7 +50,7 @@ public class Task {
         this.id = id;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.StringJoiner;
 
 public class Subtask extends Task {
-    public final int masterId;
+    private final int masterId;
     public Subtask(String name, String description, int masterId) {
         super(name, description);
         this.masterId = masterId;

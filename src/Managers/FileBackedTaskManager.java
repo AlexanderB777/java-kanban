@@ -1,12 +1,13 @@
 package Managers;
 
 import Tasks.*;
+import utils.ComparatorById;
+import utils.TaskInteractionException;
 
 import java.io.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -40,7 +41,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             String[] fromLine = line.split(",");
             switch (fromLine[0]) {
                 case ("TASK"):
-                    createTask(new Task(fromLine[2],
+                    createTaskWithId(new Task(fromLine[2],
                             fromLine[4],
                             TaskStatus.valueOf(fromLine[3]),
                             Integer.parseInt(fromLine[1]),
@@ -48,7 +49,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                             Duration.parse(fromLine[6])));
                     break;
                 case ("SUBTASK"):
-                    createSubtask(new Subtask(fromLine[2],
+                    createSubtaskWithId(new Subtask(fromLine[2],
                             fromLine[4],
                             Integer.parseInt(fromLine[5]),
                             TaskStatus.valueOf(fromLine[3]),
@@ -57,16 +58,55 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                             Duration.parse(fromLine[7])));
                     break;
                 case ("EPIC"):
-                    createEpic(new Epic(fromLine[2],
+                    createEpicWithId(new Epic(fromLine[2],
                             fromLine[4],
                             TaskStatus.valueOf(fromLine[3]),
                             Integer.parseInt(fromLine[1])));
                     break;
-                default:
-                    return;
             }
         }
     }
+
+    public void createTaskWithId(Task task) {
+        if (task.getId() == null || task.getId() == 0) {
+            throw new IllegalArgumentException("Task should have ID");
+        }
+        counter = task.getId();
+        tasks.put(counter, task);
+        if (task.startTime != null) addToPrioritized(task);
+        save();
+    }
+
+    public void createSubtaskWithId(Subtask subtask) {
+        if (subtask.getId() == null || subtask.getId() == 0) {
+            throw new IllegalArgumentException("Task should have ID");
+        }
+        if (!getPrioritizedTasks()
+                .stream()
+                .allMatch(task1 -> subtask.startTime.isAfter(task1.getEndTime())
+                        || task1.startTime.isAfter(subtask.getEndTime()))) return;
+        subtask.setId(++counter);
+        subtasks.put(counter, subtask);
+        Epic masterEpic = epics.get(subtask.getMasterId());
+        if (masterEpic == null) {
+            System.out.println("Master epic of subtask with id " + subtask.getId() + " is null");
+            return;
+        }
+        masterEpic.putSubtask(subtask);
+        if (subtask.startTime != null) {
+            addToPrioritized(subtask);
+            addToPrioritized(masterEpic);
+        }
+    }
+
+    public void createEpicWithId(Epic epic) {
+        if (epic.getId() == null || epic.getId() == 0) {
+            throw new IllegalArgumentException("Task should have ID");
+        }
+        epic.setId(++counter);
+        epics.put(counter, epic);
+    }
+
 
     public void save() {
         List<String> allTasks = getAllTasksForFile();
@@ -75,10 +115,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public List<String> getAllTasksForFile() {
-        List<Object> listWithAllTasks = new ArrayList<>();
+        List<Task> listWithAllTasks = new ArrayList<>();
         listWithAllTasks.addAll(tasks.values());
         listWithAllTasks.addAll(epics.values());
         listWithAllTasks.addAll(subtasks.values());
+        listWithAllTasks.sort(new ComparatorById());
+
         return listWithAllTasks.stream().map(Object::toString).toList();
     }
 
